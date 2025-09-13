@@ -28,6 +28,13 @@ typedef struct {
 
 Token tokens[MAX_TOKENS];
 
+void remove_token(Token* tokens_in, int *argc, int index) {
+    for (int j = index; j < *argc - 1; j++) {
+        tokens_in[j] = tokens_in[j + 1];
+    }
+    (*argc)--;
+}
+
 Token tokenize(char *arg) {
   Token t;
   if(atof(arg)){
@@ -90,30 +97,22 @@ double eval_simple(Token* tokens_in, int argc){
   double result = 0;
   for(int pass = 0; pass < 5; pass++){
     for(int i = 0; i < argc; i++){
-      result = 0;
-      if(tokens[i].type == TOKEN_OPERATOR){
-        if(operator_prescedence[pass] == tokens[i].value.operator){
-          switch(operator_prescedence[pass]){
-            case '^':{
-              tokens_in[i-1].value.number = pow(tokens_in[i-1].value.number, tokens_in[i+1].value.number);break;
-            }
-            case '*':{
-              tokens_in[i-1].value.number = tokens_in[i-1].value.number * tokens_in[i+1].value.number;break;
-            }
-            case '/':{
-              tokens_in[i-1].value.number = tokens_in[i-1].value.number / tokens_in[i+1].value.number;break;
-            }
-            case '-':{
-              tokens_in[i-1].value.number = tokens_in[i-1].value.number - tokens_in[i+1].value.number;break;
-            }
-            case '+':{
-              tokens_in[i-1].value.number = tokens_in[i-1].value.number + tokens_in[i+1].value.number;break;
-            }
+      result = 0; 
+      if (tokens_in[i].type == TOKEN_OPERATOR) {
+        if (operator_prescedence[pass] == tokens_in[i].value.operator) {
+          switch(operator_prescedence[pass]) {
+            case '^': tokens_in[i-1].value.number = pow(tokens_in[i-1].value.number, tokens_in[i+1].value.number); break;
+            case '*': tokens_in[i-1].value.number *= tokens_in[i+1].value.number; break;
+            case '/': tokens_in[i-1].value.number /= tokens_in[i+1].value.number; break;
+            case '-': tokens_in[i-1].value.number -= tokens_in[i+1].value.number; break;
+            case '+': tokens_in[i-1].value.number += tokens_in[i+1].value.number; break;
           }
-          tokens_in[i].value.operator = '+';
-          tokens_in[i+1].value.number = 0;
+          // remove operator and right number
+          remove_token(tokens_in, &argc, i);   // remove operator
+          remove_token(tokens_in, &argc, i);   // remove right number
+          i--; // back up so loop doesn’t skip
         }
-      } 
+      }
       output_tokens(tokens_in,argc);
       printf("\n");
     }
@@ -132,7 +131,6 @@ int main(int argc, char *argv[]){
     tokens[i-1] = tokenize(argv[i]);
   }
   printf("%f\n", eval_simple(tokens, argc));
-  output_tokens(tokens, argc);
 }
 
 /* scope
