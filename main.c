@@ -5,7 +5,7 @@
 #include <math.h>       // pow, sqrt, cbrt, log, log10, exp
 #include <stdbool.h>    // true, false, bool type
 
-#define MAX_TOKENS 128
+#define MAX_TOKENS 1000
 
 typedef enum {
   TOKEN_NUMBER,
@@ -70,27 +70,27 @@ Token tokenize(char *arg) {
 void output_tokens(Token* tokens_in, int argc){
   for(int i = 0; i < argc; i++){
     if(tokens_in[i].type == TOKEN_NUMBER){
-      printf("num:%f ", tokens_in[i].value.number);
+      printf("%f ", tokens_in[i].value.number);
     }
     if(tokens_in[i].type == TOKEN_FUNCTION){
-      printf("func:%s ", tokens_in[i].value.func_name);
+      printf("%s ", tokens_in[i].value.func_name);
     }  
     if(tokens_in[i].type == TOKEN_VARIABLE){
-      printf("var:%c ", tokens_in[i].value.variable);
+      printf("%c ", tokens_in[i].value.variable);
     }  
     if(tokens_in[i].type == TOKEN_OPERATOR){
-      printf("oper:%c ", tokens_in[i].value.operator);
+      printf("%c ", tokens_in[i].value.operator);
     }  
     if(tokens_in[i].type == TOKEN_RPAREN){
-      printf("rparen:%c ", '(');
+      printf("%c ", '(');
     } 
     if(tokens_in[i].type == TOKEN_LPAREN){
-      printf("lparen:%c ", ')');
+      printf("%c ", ')');
     }  
   }
 }
 
-char operator_prescedence[5] = {'^','*', '/', '-', '+'};
+char operator_prescedence[5] = {'^','*', '/', '+', '-'};
 
 double eval_simple(Token* tokens_in, int argc){
   double final_number = 0;
@@ -104,8 +104,8 @@ double eval_simple(Token* tokens_in, int argc){
             case '^': tokens_in[i-1].value.number = pow(tokens_in[i-1].value.number, tokens_in[i+1].value.number); break;
             case '*': tokens_in[i-1].value.number *= tokens_in[i+1].value.number; break;
             case '/': tokens_in[i-1].value.number /= tokens_in[i+1].value.number; break;
-            case '-': tokens_in[i-1].value.number -= tokens_in[i+1].value.number; break;
             case '+': tokens_in[i-1].value.number += tokens_in[i+1].value.number; break;
+            case '-': tokens_in[i-1].value.number -= tokens_in[i+1].value.number; break;
           }
           // remove operator and right number
           remove_token(tokens_in, &argc, i);   // remove operator
